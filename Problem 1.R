@@ -1,11 +1,12 @@
 library(MASS)
 library(lmerTest)
+library(lme4)
 # We vary sample size from 5 to 40 >> CHANGED B(1) FROM 5 TO 3 (WEAKER ASSOC.)
 p.matrix = c()
-for (N in seq(3,40,by=3)) {
+for (N in seq(45,60,by=5)) {
   p.temp.vector = c()
   # We repeat simulation for 500 times for each N (Step 3)
-  for (i in 1:500) {
+  for (i in 1:100) {
     # Set seed
     set.seed(i)
     # Step 1: generate data
@@ -30,7 +31,7 @@ for (N in seq(3,40,by=3)) {
     dat = merge(dat,U1,by='id')
     
     # Simulate the outcome: Reaction_ij
-    dat$Reaction = (251.405 + dat$V1) + (5 + dat$V2)*dat$Days + dat$err
+    dat$Reaction = (251.405 + dat$V1) + (3 + dat$V2)*dat$Days + dat$err
     
     # Step 2: test the null hypothesis
     mod = lmer(Reaction ~ Days + (Days | id), dat)
@@ -40,6 +41,7 @@ for (N in seq(3,40,by=3)) {
   }
   # Save p value vector for each N
   p.matrix = cbind(p.matrix,p.temp.vector)
+  print(N)
 }
 # Step 4: calculate power
 power = apply(p.matrix,2,function(x) mean(x<0.05))
